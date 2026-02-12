@@ -1,34 +1,22 @@
-"""
-URL configuration for college_erp project.
-"""
-
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import HttpResponse
 
 
-# ----------------------------------------
-# Simple Health Check View (Root URL)
-# ----------------------------------------
-def home(request):
-    return HttpResponse("🚀 College ERP Backend is Running Successfully!")
+def health_check(request):
+    return HttpResponse("ERP Backend Running ✅")
 
 
 urlpatterns = [
-
-    # Root URL (Health Check)
-    path("", home, name="home"),
+    # Root health check
+    path("", health_check),
 
     # Django Admin
     path("admin/", admin.site.urls),
 
-    # =====================================
-    # ERP API ROUTES
-    # =====================================
-
-    # AUTH (login, otp, password)
+    # AUTH
     path("api/auth/", include("accounts.urls")),
 
     # STUDENTS
@@ -40,14 +28,9 @@ urlpatterns = [
     # ACADEMICS
     path("api/academics/", include("academics.urls")),
 
-    # ADMINISTRATION (Excel uploads)
+    # ADMINISTRATION
     path("api/admin/", include("administration.urls")),
 ]
 
-
-# =====================================
-# MEDIA & STATIC (DEV ONLY)
-# =====================================
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
