@@ -10,25 +10,18 @@ def health_check(request):
 
 
 urlpatterns = [
+
+    # Django Admin FIRST
+    path("admin/", admin.site.urls),
+
     # Root health check
     path("", health_check),
 
-    # Django Admin
-    path("admin/", admin.site.urls),
-
-    # AUTH
+    # APIs
     path("api/auth/", include("accounts.urls")),
-
-    # STUDENTS
     path("api/students/", include("students.urls")),
-
-    # FACULTY
     path("api/faculty/", include("faculty.urls")),
-
-    # ACADEMICS
     path("api/academics/", include("academics.urls")),
-
-    # ADMINISTRATION
     path("api/admin/", include("administration.urls")),
 ]
 
