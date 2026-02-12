@@ -1,9 +1,12 @@
 """
 Django settings for college_erp project.
+Production Ready for Render Deployment
 """
 
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
+import os
 
 # --------------------------------------------------
 # BASE DIRECTORY
@@ -14,18 +17,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------
-SECRET_KEY = 'django-insecure-r3dia6--2&2*wz@58=06ot@g*#4s^w6$-u1zw47i7qc@ovmwyx'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
-DEBUG = True   # ❗ Set False in production
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']   # For Flutter testing
+ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 
 # --------------------------------------------------
 # APPLICATIONS
 # --------------------------------------------------
 INSTALLED_APPS = [
-    # 🔑 ERP CORE (CUSTOM USER MUST COME FIRST)
+    # Custom user app first
     'accounts',
 
     # ERP APPS
@@ -35,7 +38,7 @@ INSTALLED_APPS = [
     'administration',
     'common',
 
-    # Django default apps
+    # Default Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,8 +56,9 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,9 +69,12 @@ MIDDLEWARE = [
 
 
 # --------------------------------------------------
-# CORS (Flutter ↔ Django)
+# CORS SETTINGS (Flutter Production Safe)
 # --------------------------------------------------
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
 CORS_ALLOW_CREDENTIALS = True
 
 
@@ -104,13 +111,14 @@ WSGI_APPLICATION = 'college_erp.wsgi.application'
 
 
 # --------------------------------------------------
-# DATABASE (SQLite for dev)
+# DATABASE (Render PostgreSQL)
 # --------------------------------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 
@@ -129,9 +137,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNATIONALIZATION
 # --------------------------------------------------
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Kolkata'
-
 USE_I18N = True
 USE_TZ = True
 
@@ -143,16 +149,14 @@ AUTH_USER_MODEL = "accounts.User"
 
 
 # --------------------------------------------------
-# EMAIL (OTP + PASSWORD DELIVERY)
+# EMAIL CONFIGURATION (Use ENV variables)
 # --------------------------------------------------
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "adamkisred@gmail.com"
-EMAIL_HOST_PASSWORD = "fenuroluuwyjlops"
-DEFAULT_FROM_EMAIL = "SVREC ERP <noreply@svrec.ac.in>"
-
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
@@ -164,6 +168,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # --------------------------------------------------
@@ -178,6 +184,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+
+# --------------------------------------------------
+# SECURITY SETTINGS FOR PRODUCTION
+# --------------------------------------------------
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 
 # --------------------------------------------------
