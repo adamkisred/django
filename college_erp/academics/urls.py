@@ -1,0 +1,38 @@
+from django.urls import path
+from academics.views import (
+    SubjectContextOptionsView,
+    SubjectListCreateView,
+    SubjectDeleteView,
+    SubjectTemplateDownloadView,
+    SubjectExcelUploadView,
+    SubjectExcelExportView,
+    TimetableContextView,
+    TimetableFacultySearchView,
+    TimetableMappingCreateView,
+    SubjectFacultyMappingSaveView,
+    TimetableAutoGenerateView,
+    TimetableSaveView,
+    MidMarksContextOptionsView,
+    MidMarksTemplateDownloadView,
+    MidMarksUploadView,
+    MidMarksExportView,
+)
+
+urlpatterns = [
+    path("subjects/context-options/", SubjectContextOptionsView.as_view()),
+    path("subjects/", SubjectListCreateView.as_view()),
+    path("subjects/<int:subject_pk>/", SubjectDeleteView.as_view()),
+    path("subjects/template/", SubjectTemplateDownloadView.as_view()),
+    path("subjects/upload/", SubjectExcelUploadView.as_view()),
+    path("subjects/export/", SubjectExcelExportView.as_view()),
+    path("timetable/context/", TimetableContextView.as_view()),
+    path("timetable/faculty-search/", TimetableFacultySearchView.as_view()),
+    path("timetable/map/", TimetableMappingCreateView.as_view()),
+    path("timetable/subject-faculty/save/", SubjectFacultyMappingSaveView.as_view()),
+    path("timetable/auto-generate/", TimetableAutoGenerateView.as_view()),
+    path("timetable/save/", TimetableSaveView.as_view()),
+    path("midmarks/context-options/", MidMarksContextOptionsView.as_view()),
+    path("midmarks/template/", MidMarksTemplateDownloadView.as_view()),
+    path("midmarks/upload/", MidMarksUploadView.as_view()),
+    path("midmarks/export/", MidMarksExportView.as_view()),
+]
